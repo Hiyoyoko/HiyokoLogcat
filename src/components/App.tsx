@@ -50,7 +50,7 @@ function App() {
       setLogs((prev) => [...prev, ...event.payload]);
     });
 
-    const unlistenUsb = listen<string>("usb-event", (event) => {
+    const unlistenUsb = listen<string>("usb-event", () => {
       fetchDevices();
     });
 

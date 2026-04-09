@@ -1,5 +1,5 @@
 import React from "react";
-import { Smartphone, RefreshCw, Smartphone as Tablet, Zap, Play, Trash2, Settings, Search } from "lucide-react";
+import { Smartphone, RefreshCw, Zap, Play, Trash2, Settings, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Device } from "../types";
 

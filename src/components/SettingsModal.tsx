@@ -1,5 +1,5 @@
 import React from "react";
-import { Settings, X } from "lucide-react";
+import { Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SettingsModalProps {
