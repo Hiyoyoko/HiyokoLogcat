@@ -390,3 +390,16 @@ button {
 .cursor-pointer {
   cursor: pointer;
 }
+/* ========== Animations ========== */
+@keyframes hiyoko-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.hiyoko-pulse {
+  display: inline-block;
+  animation: hiyoko-pulse 1s infinite ease-in-out;
+  transform-origin: center;
+  vertical-align: middle;
+}

@@ -1,11 +1,11 @@
 pub mod adb;
-pub mod logcat;
 pub mod ai;
+pub mod logcat;
 pub mod usbmon;
 
-use std::sync::Arc;
-use tauri::{AppHandle, Manager, State};
 use crate::logcat::LogManager;
+use std::sync::Arc;
+use tauri::{AppHandle, State};
 
 #[tauri::command]
 async fn get_devices() -> Result<Vec<adb::DeviceInfo>, String> {
@@ -29,15 +29,16 @@ async fn start_logging(
 async fn analyze_error(
     state: State<'_, Arc<LogManager>>,
     index: usize,
+    log_content: String,
     api_key: String,
 ) -> Result<String, String> {
-    let logs = state.get_context(index, 100);
-    let error_line = logs.iter().enumerate()
-        .find(|(i, _)| *i == 100 || *i == logs.len() / 2) // 中心（対象行）を見つける
-        .map(|(_, l)| l.raw.clone())
-        .unwrap_or_default();
-    
+    // フィルタ等でズレている可能性があるため、本文で再検索して正しいインデックスを得る
+    let real_index = state.find_index_by_content(&log_content).unwrap_or(index);
+
+    let logs = state.get_context(real_index, 100);
+    let error_line = log_content.clone();
     let context_strings = logs.iter().map(|l| l.raw.clone()).collect();
+
     ai::analyze_with_gemini(&api_key, error_line, context_strings).await
 }
 
@@ -46,6 +47,7 @@ pub fn run() {
     let log_manager = Arc::new(LogManager::new());
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let handle = app.handle().clone();
             crate::usbmon::start_usb_monitoring(handle);

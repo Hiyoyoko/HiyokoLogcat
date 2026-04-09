@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DeviceInfo {
@@ -36,7 +36,11 @@ pub async fn list_devices() -> Result<Vec<DeviceInfo>, String> {
                 }
             }
 
-            devices.push(DeviceInfo { serial, status, model });
+            devices.push(DeviceInfo {
+                serial,
+                status,
+                model,
+            });
         }
     }
 

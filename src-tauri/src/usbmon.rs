@@ -1,10 +1,10 @@
-use usbwatch_rs::{UsbWatcher};
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
+use usbwatch_rs::UsbWatcher;
 
 pub fn start_usb_monitoring(app_handle: AppHandle) {
     let (tx, mut rx) = mpsc::channel(100);
-    
+
     // UsbWatcher instance must be kept alive.
     std::thread::spawn(move || {
         let _watcher = match UsbWatcher::new(tx) {
@@ -27,4 +27,3 @@ pub fn start_usb_monitoring(app_handle: AppHandle) {
         }
     });
 }
-

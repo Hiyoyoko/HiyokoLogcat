@@ -1,10 +1,10 @@
+use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
+use tauri::{AppHandle, Emitter};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
-use serde::{Serialize, Deserialize};
-use tauri::{AppHandle, Emitter};
-use tokio::time::{Duration, interval};
+use tokio::time::{interval, Duration};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LogLine {
@@ -24,7 +24,7 @@ impl LogManager {
     }
 
     pub fn add_log(&self, line: LogLine) {
-        let mut buffer = self.ring_buffer.lock().unwrap();
+        let mut buffer = self.ring_buffer.lock().unwrap_or_else(|e| e.into_inner());
         if buffer.len() >= 2000 {
             buffer.pop_front();
         }
@@ -32,10 +32,20 @@ impl LogManager {
     }
 
     pub fn get_context(&self, around_index: usize, range: usize) -> Vec<LogLine> {
-        let buffer = self.ring_buffer.lock().unwrap();
-        let start = around_index.saturating_sub(range);
+        let buffer = self.ring_buffer.lock().unwrap_or_else(|e| e.into_inner());
+        let start = around_index.saturating_sub(range).min(buffer.len());
         let end = (around_index + range).min(buffer.len());
-        buffer.iter().skip(start).take(end - start).cloned().collect()
+        buffer
+            .iter()
+            .skip(start)
+            .take(end - start)
+            .cloned()
+            .collect()
+    }
+
+    pub fn find_index_by_content(&self, content: &str) -> Option<usize> {
+        let buffer = self.ring_buffer.lock().unwrap_or_else(|e| e.into_inner());
+        buffer.iter().position(|l| l.raw == content)
     }
 }
 
@@ -46,8 +56,8 @@ pub async fn start_logcat_stream(
 ) -> Result<(), String> {
     let mut args = vec!["logcat", "-v", "threadtime"];
     if let Some(s) = &serial {
-        args.insert(0, "-s");
         args.insert(0, s);
+        args.insert(0, "-s");
     }
 
     let mut child = Command::new("adb")
@@ -58,7 +68,7 @@ pub async fn start_logcat_stream(
 
     let stdout = child.stdout.take().unwrap();
     let mut reader = BufReader::new(stdout).lines();
-    
+
     let mut batch = Vec::new();
     let mut batch_interval = interval(Duration::from_millis(100));
 
@@ -70,7 +80,7 @@ pub async fn start_logcat_stream(
                         let log_line = parse_log_line(line);
                         log_manager.add_log(log_line.clone());
                         batch.push(log_line);
-                        
+
                         if batch.len() >= 500 {
                             let _ = app_handle.emit("log-batch", &batch);
                             batch.clear();
@@ -95,13 +105,22 @@ pub async fn start_logcat_stream(
 fn parse_log_line(raw: String) -> LogLine {
     // 簡易パース: ログレベルの抽出
     // threadtime 形式の例: "04-09 21:23:45.678  1234  5678 E Tag: Message"
-    let level = if raw.contains(" V ") { "V" }
-        else if raw.contains(" D ") { "D" }
-        else if raw.contains(" I ") { "I" }
-        else if raw.contains(" W ") { "W" }
-        else if raw.contains(" E ") { "E" }
-        else if raw.contains(" F ") { "F" }
-        else { "I" }.to_string();
+    let level = if raw.contains(" V ") {
+        "V"
+    } else if raw.contains(" D ") {
+        "D"
+    } else if raw.contains(" I ") {
+        "I"
+    } else if raw.contains(" W ") {
+        "W"
+    } else if raw.contains(" E ") {
+        "E"
+    } else if raw.contains(" F ") {
+        "F"
+    } else {
+        "I"
+    }
+    .to_string();
 
     LogLine { raw, level }
 }

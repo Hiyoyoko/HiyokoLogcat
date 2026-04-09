@@ -1,57 +1,58 @@
-# HiyokoLogcat 🐣
+# 🐣 HiyokoLogcat
 
-> 重いIDEはいらない。ひよこが解決する超速・高機能Logcatビューア。
+HiyokoLogcat is a professional, high-performance Android Logcat viewer designed for developers who value both aesthetics and efficiency. It features integrated AI diagnostics powered by Google Gemini, real-time filtering, and a sleek modern interface.
 
-**HiyokoLogcat** は、Tauri (Rust) と React を用いて構築された、全く新しい Android ログキャットビューアです。Android Studio を立ち上げる必要はなく、一瞬で起動し、数万行のログが流れても決してフリーズしない「超速」の世界を実現します。
+![HiyokoLogcat Screenshot](public/screenshot.png) <!-- Note: User should replace this with an actual screenshot -->
 
-## ✨ 特徴 (Features)
+## ✨ Features
 
-🚀 **超速ストリーミング & バッファリング**
-Rustの並行処理 (`tokio`) を駆使し、ADBからの標準出力を瞬時にキャプチャ。100ms/500行単位での高度なバッファリングにより、フロントエンドへの描画負荷を極小化しています。
+- **🐣 AI Diagnostic**: Instantly analyze error logs with Gemini 1.5/2.0. Get root cause analysis and solutions directly in the UI.
+- **⚡ Super Fast**: Handles thousands of log lines with 0 lag using virtualization.
+- **🔍 Real-time Filtering**: Filter by Level (Error, Warn, Info) or Search query instantly.
+- **📱 Device Management**: Auto-detects USB-connected Android devices.
+- **🎨 Premium UI**: Dark mode, vibrant color coding, and smooth animations.
 
-📜 **仮想スクロールによる無限ログ**
-フロントエンドには `react-virtuoso` を採用。数万、数十万の行数が流れても、DOMレンダリングを画面内に限定することで、常に60FPSの滑らかなスクロールを維持します。
+## 🚀 Getting Started
 
-🐣 **Gemini API 連携による「1クリックAI診断」**
-ログの海で迷う必要はありません。エラー行の隣にある「🐣ボタン」をクリックするだけで、Rust側のメモリにある「前後100行」の文脈を瞬時に抽出し、Google Gemini API が日本語で原因と解決策を提案します。
+### Prerequisites
 
-🛡 **セキュアなプライバシーフィルタ**
-AIへログを送信する前に、Rustレイヤーの正規表現フィルタが**IPアドレスやメールアドレスを自動でマスキング**。機密情報漏洩の心配なくAI診断を利用できます。APIキーは `tauri-plugin-store` を用いてローカルに安全に暗号化保存されます。
+- [Rust](https://www.rust-lang.org/)
+- [Node.js](https://nodejs.org/)
+- [Android SDK (ADB)](https://developer.android.com/studio/releases/platform-tools)
 
-🎨 **ひよこカラー & プレミアムダークデザイン**
-V(Verbose), D(Debug), I(Info), W(Warn), E(Error), F(Fatal) ごとに見やすく設計されたカスタムカラーテーマ（ひよこカラー）。
+### Installation
 
-## 🛠 技術構成 (The Stack)
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/Hiyoyoko/Hiyoko-logcat.git
+    cd Hiyoko-logcat
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Run in development mode:
+    ```bash
+    npm run tauri dev
+    ```
 
-- **Core**: Rust (Tauri v2)
-- **Frontend**: React 18 / TypeScript
-- **State/Async**: tokio, tauri-plugin-store
-- **AI**: Gemini 1.5 Flash API (by Google AI Studio)
-- **Localization**: i18next (English & Japanese)
+### AI Configuration
 
-## 🚀 インストール & 起動 (Getting Started)
+1.  Open **Settings** (Gear icon ⚙️).
+2.  Enter your **Gemini API Key** (Get one from [Google AI Studio](https://aistudio.google.com/)).
+3.  Click **Save**.
+4.  Click the **🐣 icon** next to any log line to start diagnosis!
 
-### 開発環境での実行
-\`\`\`bash
-# 依存関係のインストール
-npm install
+## 🛠 Tech Stack
 
-# 開発用サーバーの起動 (Vite + Tauri)
-npm run tauri dev
-\`\`\`
+- **Frontend**: React, TypeScript, Vite, Lucide React
+- **Backend**: Rust, Tauri v2
+- **AI Engine**: Google Gemini API
+- **Persistence**: Tauri Plugin Store
 
-### ビルド (プロトタイプ配布用)
-\`\`\`bash
-npm run tauri build
-\`\`\`
-*(ビルドには Mac の場合 Xcode Command Line Tools, Windows の場合は C++ Build Tools が必要です)*
+## 📄 License
 
-## 🔐 AI診断機能の使用方法
-1. アプリ右上の「⚙ (Settings)」ボタンをクリック。
-2. Google AI Studio で取得した **Gemini API Key** を入力して保存。
-3. デバイスから流れてくるログのエラー行（E や F など）にマウスをホバーし、現れる 🐣 アイコンをクリック！
-4. ひよこがログの文脈を読み取り、数秒で日本語の解決案を提示します。
+MIT License
 
-## 🤝 貢献 (Contributing)
-Issue や Pull Request は随時歓迎です。
-Let's make Android debugging fast, fun, and adorable! 🐤
+---
+Developed with 💖 for Android Developers.
