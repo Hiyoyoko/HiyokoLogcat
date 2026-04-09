@@ -60,11 +60,14 @@ pub async fn analyze_with_gemini(
 
     if !response.status().is_success() {
         let status = response.status();
-        let err_body = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error body".to_string());
-        return Err(format!("API error ({}): {}", status, err_body));
+        let message = match status.as_u16() {
+            401 => "APIキーが無効、または権限がありません。設定を確認してくださいぴよ。",
+            429 => "APIの利用制限（クォータ）を超えました。しばらく待ってから再度試してくださいぴよ。",
+            500 => "Google側のサーバーでエラーが発生しました。時間を置いて試してくださいぴよ。",
+            503 => "GoogleのAIサーバーが非常に混雑しています。少し時間を空けて再試行してくださいぴよ。",
+            _ => "APIエラーが発生しました。時間を置いて再度試してくださいぴよ。",
+        };
+        return Err(message.to_string());
     }
 
     let json: serde_json::Value = response

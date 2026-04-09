@@ -49,9 +49,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
               {d.model}
             </option>
           ))}
-          {devices.length === 0 && <option value="">No Device</option>}
+          {devices.length === 0 && <option value="">{t("devices.empty")}</option>}
         </select>
-        <button onClick={fetchDevices} className="btn-sq" title="Refresh">
+        <button onClick={fetchDevices} className="btn-sq" title={t("action.refresh") || "Refresh"}>
           <RefreshCw size={14} />
         </button>
       </div>
@@ -63,21 +63,21 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <button
           className={`level-button E ${activeLevels.has("E") ? "active" : ""}`}
           onClick={() => toggleLevel("E")}
-          title="Filter Error"
+          title={t("filter.error") || "Filter Error"}
         >
           <span style={{ color: "#f7768e" }}>🔴</span>
         </button>
         <button
           className={`level-button W ${activeLevels.has("W") ? "active" : ""}`}
           onClick={() => toggleLevel("W")}
-          title="Filter Warn"
+          title={t("filter.warn") || "Filter Warn"}
         >
           <span style={{ color: "#e0af68" }}>🟡</span>
         </button>
         <button
           className={`level-button I ${activeLevels.has("I") ? "active" : ""}`}
           onClick={() => toggleLevel("I")}
-          title="Filter Info"
+          title={t("filter.info") || "Filter Info"}
         >
           <span style={{ color: "#7aa2f7" }}>🔵</span>
         </button>
@@ -108,11 +108,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <span>{isLogging ? t("action.logging") : t("action.startLog")}</span>
         </button>
 
-        <button onClick={clearLogs} className="btn-sq" title="Clear Logs">
+        <button onClick={clearLogs} className="btn-sq" title={t("action.clear") || "Clear Logs"}>
           <Trash2 size={14} />
         </button>
 
-        <button onClick={() => setShowSettings(true)} className="btn-sq" title="Settings">
+        <button onClick={() => setShowSettings(true)} className="btn-sq" title={t("action.settings") || "Settings"}>
           <Settings size={14} />
         </button>
       </div>

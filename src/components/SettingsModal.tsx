@@ -1,5 +1,6 @@
 import React from "react";
 import { Settings, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SettingsModalProps {
   apiKey: string;
@@ -14,28 +15,30 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onSave,
   onClose,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="settings-overlay">
       <div className="settings-modal">
         <h2 className="settings-title">
-          <Settings size={20} /> Settings
+          <Settings size={20} /> {t("settings.title")}
         </h2>
         <div className="settings-form-group">
-          <label>Gemini API Key</label>
+          <label>{t("settings.apiKey")}</label>
           <input
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             className="settings-input"
-            placeholder="AIzaSy..."
+            placeholder={t("settings.apiKeyPlaceholder") || "AIzaSy..."}
           />
         </div>
         <div className="settings-actions">
           <button onClick={onClose} className="btn-cancel">
-            Close
+            {t("settings.close")}
           </button>
           <button onClick={onSave} className="btn-save">
-            Save
+            {t("settings.save")}
           </button>
         </div>
       </div>

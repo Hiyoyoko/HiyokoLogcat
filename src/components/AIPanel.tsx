@@ -1,5 +1,6 @@
 import React from "react";
 import { MessageSquare, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import HiyokoIcon from "./HiyokoIcon";
 
 interface AIPanelProps {
@@ -8,6 +9,8 @@ interface AIPanelProps {
 }
 
 const AIPanel: React.FC<AIPanelProps> = ({ response, onClose }) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="settings-overlay" onClick={onClose} />
@@ -15,7 +18,7 @@ const AIPanel: React.FC<AIPanelProps> = ({ response, onClose }) => {
         <div className="ai-overlay-header">
           <div className="flex items-center gap-2">
             <MessageSquare size={14} />
-            <span>Diagnostic Result</span>
+            <span>{t("ai.title")}</span>
           </div>
           <X size={16} className="cursor-pointer" onClick={onClose} />
         </div>

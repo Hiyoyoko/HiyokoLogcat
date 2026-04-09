@@ -10,6 +10,7 @@ import LogList from "./LogList";
 import AIPanel from "./AIPanel";
 import SettingsModal from "./SettingsModal";
 import HiyokoIcon from "./HiyokoIcon";
+import Toast from "./Toast";
 
 // Types
 import { LogLine, Device } from "../types";
@@ -36,6 +37,8 @@ function App() {
   // Settings
   const [showSettings, setShowSettings] = useState(false);
   const [apiKey, setApiKey] = useState("");
+
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
   const virtuosoRef = useRef<any>(null);
   const scrollTracker = useRef({ isAtBottom: true });
@@ -127,8 +130,10 @@ function App() {
         apiKey,
       });
       setAiResponse(answer);
+      setToast({ message: t("ai.completed"), type: "success" });
     } catch (e) {
       setAiResponse(t("ai.failed") + "\n" + e);
+      setToast({ message: String(e), type: "error" });
     }
   };
 
@@ -138,11 +143,10 @@ function App() {
       await store.set("gemini_api_key", { value: apiKey });
       await store.save();
       setShowSettings(false);
+      setToast({ message: t("settings.saved"), type: "success" });
     } catch (e) {
       console.error("Failed to save settings:", e);
-      alert(
-        `Failed to save settings: ${e}\n\nThis usually happens if the Store plugin registration or permissions are missing.`
-      );
+      setToast({ message: `${t("settings.saveFailed")}${e}`, type: "error" });
     }
   };
 
@@ -190,6 +194,15 @@ function App() {
           setApiKey={setApiKey}
           onSave={saveSettings}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
         />
       )}
     </div>

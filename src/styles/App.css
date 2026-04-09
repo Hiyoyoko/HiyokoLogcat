@@ -403,3 +403,45 @@ button {
   transform-origin: center;
   vertical-align: middle;
 }
+
+/* ========== Toast Notification ========== */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #222;
+  border: 1px solid #444;
+  border-left: 4px solid #3a7bd5;
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  animation: slide-in 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.toast-container.success {
+  border-left-color: #9ece6a;
+}
+
+.toast-container.error {
+  border-left-color: #f7768e;
+}
+
+.toast-message {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.text-success { color: #9ece6a; }
+.text-error { color: #f7768e; }
+.text-info { color: #3a7bd5; }
+
+@keyframes slide-in {
+  from { transform: translateX(120%); }
+  to { transform: translateX(0); }
+}
