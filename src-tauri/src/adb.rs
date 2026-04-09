@@ -8,13 +8,47 @@ pub struct DeviceInfo {
     pub model: String,
 }
 
+pub fn resolve_adb_path() -> String {
+    let common_paths = [
+        "/opt/homebrew/bin/adb",
+        "/usr/local/bin/adb",
+        "/usr/bin/adb",
+    ];
+
+    // 1. 標準的なインストールパスをチェック
+    for path in common_paths {
+        if std::path::Path::new(path).exists() {
+            return path.to_string();
+        }
+    }
+
+    // 2. Android SDK (HOME) をチェック
+    if let Ok(home) = std::env::var("HOME") {
+        let sdk_path = format!("{}/Library/Android/sdk/platform-tools/adb", home);
+        if std::path::Path::new(&sdk_path).exists() {
+            return sdk_path;
+        }
+    }
+
+    // 3. 環境変数 (ANDROID_HOME) をチェック
+    if let Ok(sdk_home) = std::env::var("ANDROID_HOME") {
+        let path = format!("{}/platform-tools/adb", sdk_home);
+        if std::path::Path::new(&path).exists() {
+            return path;
+        }
+    }
+
+    "adb".to_string() // フォールバック
+}
+
 pub async fn list_devices() -> Result<Vec<DeviceInfo>, String> {
-    let output = Command::new("adb")
+    let adb_path = resolve_adb_path();
+    let output = Command::new(adb_path)
         .arg("devices")
         .arg("-l")
         .output()
         .await
-        .map_err(|e| format!("Failed to run adb: {}", e))?;
+        .map_err(|e| format!("Failed to run adb ({}): {}", resolve_adb_path(), e))?;
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     let mut devices = Vec::new();

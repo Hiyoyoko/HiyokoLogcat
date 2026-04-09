@@ -60,11 +60,12 @@ pub async fn start_logcat_stream(
         args.insert(0, "-s");
     }
 
-    let mut child = Command::new("adb")
+    let adb_path = crate::adb::resolve_adb_path();
+    let mut child = Command::new(adb_path)
         .args(&args)
         .stdout(std::process::Stdio::piped())
         .spawn()
-        .map_err(|e| format!("Failed to start adb: {}", e))?;
+        .map_err(|e| format!("Failed to start adb ({}): {}", crate::adb::resolve_adb_path(), e))?;
 
     let stdout = child.stdout.take().unwrap();
     let mut reader = BufReader::new(stdout).lines();
