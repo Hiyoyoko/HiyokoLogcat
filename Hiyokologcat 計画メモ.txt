@@ -1,0 +1,71 @@
+## 🐥 プロジェクト名：HiyokoLogcat
+コンセプト： 「重いIDEはいらない。ひよこが解決する超速・高機能Logcatビューア」
+
+## 1. 技術スタック（The Stack）
+Core: Rust (Performance & Safety)
+GUI: Tauri (Lightweight Native App)
+Async: tokio (ADBストリーム処理)
+AI: Gemini API (Google AI Studio / Free Tier)
+Communication: tauri::Window::emit (Rust → Frontend への高速ログ転送)
+
+## 2. バックエンド設計（Rust Side）
+ADBストリーム管理:
+tokio::process::Command で adb logcat -v threadtime を実行。
+BufReader を用いた非同期の1行読み取り。
+ログ・バッファリング（重要）:
+1行ずつフロントへ送らず、100ms単位または500行単位で Vec<LogLine> をバッファリングして一括送信（描画負荷の軽減）。
+リングバッファ:
+最新の2,000行程度をRust側のメモリに保持。AI診断時に「前後100行」を即座に切り出す用。
+プライバシーフィルタ:
+Geminiに投げる前に、正規表現でIPアドレスやメールアドレスを簡易マスキングする機能を実装。
+
+## 3. フロントエンド設計（UI Side）
+ログレンダリング:
+**仮想スクロール（Virtual Scroll）**の実装。数万行のログがあっても表示領域のみをDOM生成し、メモリ消費を抑える。
+カラフル表示:
+V/D/I/W/E/F のログレベルに応じたカラーテーマ（ひよこカラー 🐣）。
+ワンクリックAIボタン:
+エラーログ横の「ひよこアイコン」をクリックで診断リクエストをRustへ発火。
+
+## 4. Gemini AI 診断ロジック
+プロンプト構成:
+System: 「あなたはAndroid開発のスペシャリストです。以下のログからエラー原因と解決策を、日本語で簡潔に回答してください。」
+Context: 選択されたエラー行 + 前後50〜100行のログ。
+規約・安全対策:
+設定画面に「無料版APIは学習に利用される可能性がある」旨のディスクレイマーを表示。
+APIキーはユーザー自身に取得してもらい、ローカルのセキュアストレージに保存。
+
+## 5. GitHub OSS戦略
+READMEビジュアル:
+Rust製であることの「爆速感」を伝えるベンチマークやGIFを掲載。
+売名（ブランディング）ポイント:
+「Android Studioを起動せずに、これ1つでデバッグが完結する」という軽量性を強調。
+英語・日本語の両対応。
+
+## 6. 最初の実装ステップ（TODO）
+[x] cargo tauri init でプロジェクト作成。
+[x] Rust側で adb logcat を叩き、標準出力を println! するだけのコードを書く。
+[x] 2の出力を Tauri Event でフロントエンドへ流し、画面に表示させる。
+[x] 仮想スクロールを導入し、ログを流しっぱなしにしても重くならないかテスト。
+
+## 7. 実装済み（IMPLEMENTED）- 2026/04/09
+[x] Phase 1: Tauri v2 + React TypeScript プロジェクト初期化
+[x] Phase 2: 非同期 ADB ストリーム & 100ms/500行バッファリング
+[x] Phase 3: react-virtuoso による仮想スクロール UI & ひよこカラー
+[x] Phase 4: Gemini 1.5 API 連携 & 自動プライバシーフィルタ
+[x] Phase 5: 日本語・英語対応 & tauri-plugin-store キー保存
+[x] UI Overhaul: 指定1行ツールバー & ログエリア全画面化の実現（高視認性）
+[x] Project Refactoring: components/styles/i18n への階層化整理による保守性向上
+[x] AI Display: 固定パネルを廃止し、ESCで閉じれる「診断オーバーレイ」へ進化
+[x] Styling: プロフェッショナルなダークテーマ（App.css）の適用
+
+---
+直接使い回せるもの：
+- ADBプロセス起動・stdout読み取りの実装
+- USBホットプラグ検知（usbwatch-rs）
+- Tauri + Reactの基本構成
+- tauri-plugin-storeでの設定保存
+
+応用できるもの：
+- ffmpegストリーム処理の知見 → ADB stdoutのストリーム処理に近い
+- Mini-Dash UIコンポーネント → logcatビューアのUI参考になる
