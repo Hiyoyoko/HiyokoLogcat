@@ -6,7 +6,7 @@
 HiyokoLogcatは、Google Geminiの強力なAI診断機能を搭載した、モダンで高速なAndroid Logcatビューアーです。
 Androidエンジニアが遭遇する「原因不明のエラー」を、ひよこが最新のAI（Gemini 3 Flash Preview）と共に秒速で解析します。
 
-![Demo](public/demo.gif)
+![Image](https://github.com/user-attachments/assets/617b2524-27c1-4a2d-942f-993a55a86ffe)
 
 ## 動作環境
 - macOS 14 Sonoma以降
